@@ -12,7 +12,7 @@ MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在�
 
 ## 下载
 
-**下载链接:** [https://github.com/chandlerye/MyNote/releases)
+**下载链接:** [https://github.com/chandlerye/MyNote/releases]
 
 ## 使用说明
 - **数据库配置**
