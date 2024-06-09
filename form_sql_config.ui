@@ -140,7 +140,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>数据表名称：</string>
+            <string>数据库名称：</string>
            </property>
           </widget>
          </item>
