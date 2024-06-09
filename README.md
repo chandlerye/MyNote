@@ -5,7 +5,7 @@
 
 ## 应用简介
 
-MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在提供便捷的笔记记录、管理以及云同步功能。基于Qt 6.6.3 个人开发，本软件支持本地模式（SQLite数据库）和云模式（如MySQL），既可以本地使用，也可以联网同步使用。
+MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在提供便捷的笔记记录、管理以及云同步功能。基于Qt 6.6.3 个人开发，本软件支持本地模式（SQLite数据库）和云模式（如MySQL），既可以本地使用，也可以联网同步使用。(联网需提供自己的云数据库)
 <div align="center">
   <img src="https://chandlerye.github.io/2024/06/09/MyNote/MyNote.jpg" alt="MyNote截图" width="700" height="auto">
 </div>
