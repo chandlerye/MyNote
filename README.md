@@ -10,11 +10,11 @@ MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在�
   <img src="https://chandlerye.github.io/2024/06/09/MyNote/MyNote.jpg" alt="MyNote截图" width="700" height="auto">
 </div>
 
-### 下载
+## 下载
 
 **下载链接:** [https://github.com/chandlerye/MyNote/releases)
 
-### 使用说明
+## 使用说明
 - **数据库配置**
   - **本地模式**：默认配置，数据存储在本地SQLite数据库，无需特殊设置。
   - **云模式配置**：支持MySQL等远程数据库，需输入服务器IP、端口、数据库名、用户名和密码进行配置。
