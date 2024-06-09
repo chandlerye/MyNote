@@ -1,10 +1,19 @@
-# MyNote v2.0
-一个轻量级的笔记软件
 ---
+title: MyNote
+categories: 
+tags:
+---
+
+
+# MyNote v2.0
+一个轻量级的笔记软件📔
+
+**Github项目地址:** [https://github.com/chandlerye/MyNote/tree/main](https://github.com/chandlerye/MyNote/tree/main)
 
 ## 应用简介
 
-MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在提供便捷的笔记记录、管理以及云同步功能。基于Qt 6.6.3 开发，本软件支持本地模式（SQLite数据库）和云模式（如MySQL），满足不同用户的需求。
+MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在提供便捷的笔记记录、管理以及云同步功能。基于Qt 6.6.3 开发，本软件支持本地模式（SQLite数据库）和云模式（如MySQL），既可以本地使用，也可以联网同步使用。
+![MyNote](MyNote/MyNote.jpg)
 
 ### 使用说明
 - **数据库配置**
@@ -23,3 +32,10 @@ MyNote v2.0 是一款个人笔记管理软件，没有复杂的功能，旨在�
 - 在进行模式切换前，建议备份重要数据。
 - 使用过程中遇到任何问题，可通过提供的联系方式寻求帮助。
 ---
+
+## 捐赠
+支持一下吧❤️
+<div align="center">
+  <img src="MyNote/w.png" alt="捐赠方式1" width="200" height="auto">
+  <img src="MyNote/z.png" alt="捐赠方式2" width="200" height="auto">
+</div>
