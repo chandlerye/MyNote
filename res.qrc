@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/ico">
+        <file>about.ico</file>
+        <file>myico.ico</file>
+        <file>mysql.ico</file>
+        <file>file_output.ico</file>
+        <file>use_help.ico</file>
+        <file>local.ico</file>
+        <file>top.ico</file>
+        <file>delete.ico</file>
+        <file>font.ico</file>
+    </qresource>
+</RCC>
