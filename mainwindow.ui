@@ -159,6 +159,7 @@
     </property>
     <addaction name="mode_change"/>
     <addaction name="notefont"/>
+    <addaction name="flash"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -215,6 +216,15 @@
    </property>
    <property name="text">
     <string>字体大小</string>
+   </property>
+  </action>
+  <action name="flash">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/ico/reflash.ico</normaloff>:/ico/reflash.ico</iconset>
+   </property>
+   <property name="text">
+    <string>刷新</string>
    </property>
   </action>
  </widget>

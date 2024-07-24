@@ -15,6 +15,7 @@
 #include<QSqlRecord>
 #include<QTextCodec>
 #include<QDesktopServices>
+#include<QSplitter>
 
 #include<form_sql_config.h>
 #include<form_mode_change.h>
@@ -100,6 +101,15 @@ public:
 
     // 数据库模式初始化
     bool initializeDatabaseMode(); // 根据配置初始化数据库模式
+
+    QListWidgetItem* addItemToWidget(const QString &title, int sortOrder, int idOrder, QFont item_font, QListWidget *listWidget);
+
+
+    // item的字体大小
+    QFont item_font;
+    // 水平调整
+    // QSplitter *splitter;
+
 
 private slots:
 

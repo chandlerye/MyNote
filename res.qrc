@@ -9,5 +9,6 @@
         <file>top.ico</file>
         <file>delete.ico</file>
         <file>font.ico</file>
+        <file>reflash.ico</file>
     </qresource>
 </RCC>

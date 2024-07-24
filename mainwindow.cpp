@@ -36,6 +36,16 @@ MainWindow::~MainWindow()
 // ==================================================================================
 void MainWindow::initializeUIComponents()
 {
+    // // 创建一个QSplitter来容纳QListWidget和QTextEdit
+    // splitter = new QSplitter;
+    // splitter->setOrientation(Qt::Horizontal); // 设置方向为水平
+
+    // splitter->addWidget(ui->widget);
+    // splitter->addWidget(ui->widget_2);
+
+    // ui->widget_3->setLayout(new QVBoxLayout); // 确保widget_3有一个布局来添加splitter
+    // ui->widget_3->layout()->addWidget(splitter); // 正确地将splitter添加到widget_3的布局中
+
     highlightedBackgroundColor = QColor(200, 255, 200); // 示例颜色，绿色背景
     highlightedBackgroundColor2 = QColor(255, 255, 255); // 示例颜色，绿色背景
     // 创建数据库配置表单实例
@@ -48,7 +58,6 @@ void MainWindow::initializeUIComponents()
     topAction = new QAction(tr("置顶/取消置顶"), this);
     topAction->setIcon(QIcon(":/ico/top.ico"));
     rightClickMenu->addAction(topAction);
-
 
     //右键删除菜单
     deleteAction = new QAction(tr("删除"), this);
@@ -64,6 +73,9 @@ void MainWindow::initializeUIComponents()
     QFont font = ui->textEdit->font(); // 获取当前字体
     font.setPointSize(14); // 设置字体大小为14号
     ui->textEdit->setFont(font); // 应用新字体到QTextEdit
+
+    item_font.setPointSize(14); // 设置字体大小为14
+    item_font.setFamily("仿宋");
 }
 
 // ==================================================================================
@@ -156,6 +168,14 @@ void MainWindow::setupConnections()
     });
     // 右键删除
     connect(deleteAction, &QAction::triggered, this, &MainWindow::deleteSelectedItem);
+
+    // 刷新
+    connect(ui->flash,&QAction::triggered,this,[this](){
+        disconnect(ui->textEdit, &QTextEdit::textChanged, this, &MainWindow::onTextEditContentChanged);
+        initializeDatabaseMode();
+        showNoteForItem(ui->listWidget->item(0));  // 首项显示
+        ui->statusbar->showMessage("刷新成功！");
+    });
 }
 
 // ==================================================================================
@@ -187,7 +207,7 @@ void MainWindow::notefontset()
 
         settings.sync();
         // 应用新的字体大小到你的文本编辑器部件（这里假设存在一个名为textEdit的QTextEdit部件）
-        QFont font = ui->textEdit->font();
+        QFont font;
         font.setPointSize(fontSize);
         ui->textEdit->setFont(font);
     }
@@ -256,8 +276,8 @@ bool MainWindow::setupDatabase(QString* sqlconfig)
 
     }else if(sqlconfig[0]=="QMYSQL")
     {
-        db.setDatabaseName(sqlconfig[1]);
         db = QSqlDatabase::addDatabase(sqlconfig[0]);
+        db.setDatabaseName(sqlconfig[1]);
         db.setHostName(sqlconfig[1]);
         db.setPort(sqlconfig[2].toInt());
         db.setDatabaseName(sqlconfig[3]);
@@ -347,7 +367,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     }
 
     //笔记输入框获得焦点后，实时保存输入内容
-     if (watched == ui->textEdit) {
+    if (watched == ui->textEdit) {
         if (event->type() == QEvent::FocusIn) {
             isTextEditFocused = true;
             // 当textEdit获得焦点时，建立textChanged的信号槽连接
@@ -410,6 +430,22 @@ void MainWindow::handleDataFromFormsql()
     }
 }
 
+
+// ==================================================================================
+// addItemToWidget函数：向指定的QListWidget控件中添加一个新的列表项
+// ==================================================================================
+QListWidgetItem* MainWindow::addItemToWidget(const QString &title, int sortOrder, int idOrder, QFont item_font, QListWidget *listWidget)
+{
+    // 创建新的列表项并设置相关信息
+    QListWidgetItem *item = new QListWidgetItem(title, listWidget);
+    item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+    item->setData(Qt::UserRole, QVariant(sortOrder)); // 存储sort_order
+    item->setData(Qt::UserRole + 1, QVariant(idOrder)); // 存储id
+    item->setFont(item_font);
+    return item;
+}
+
+
 // ==================================================================================
 // 从数据库加载标题到QListWidget，同时显示note
 // ==================================================================================
@@ -431,10 +467,15 @@ void MainWindow::loadTitlesFromDatabase()
             int sortOrder = query.value(3).toInt(); // 获取sort_order序号
 
             // 创建新的列表项并设置相关信息
-            QListWidgetItem *item = new QListWidgetItem(title, ui->listWidget);
-            item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-            item->setData(Qt::UserRole, QVariant(sortOrder)); // 存储sort_order
-            item->setData(Qt::UserRole+1, QVariant(idOrder)); // 存储id
+            QListWidgetItem * item = addItemToWidget(title, sortOrder, idOrder, item_font, ui->listWidget);
+
+
+
+            // QListWidgetItem *item = new QListWidgetItem(title, ui->listWidget);
+            // item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+            // item->setData(Qt::UserRole, QVariant(sortOrder)); // 存储sort_order
+            // item->setData(Qt::UserRole+1, QVariant(idOrder)); // 存储id
+            // item->setFont(item_font);
 
             if(sortOrder>0)
             {
@@ -544,14 +585,9 @@ void MainWindow::onTextEditContentChanged()
 // ==================================================================================
 void MainWindow::on_inset_note_clicked()
 {
-    // 创建并初始化新项，允许编辑
-    QListWidgetItem * newItem = new QListWidgetItem("点击编辑标题", ui->listWidget);
 
-    newItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     // 清空textEdit的内容
     ui->textEdit->clear();
-
-    ui->listWidget->setCurrentItem(newItem);
 
     is_newAdd= true;
 
@@ -564,12 +600,23 @@ void MainWindow::on_inset_note_clicked()
         int newSortOrder = 0; // 新笔记的sort_order为当前最大值加1
         int newIdOrder = maxSortOrderQuery.value(0).toInt() + 1; // 新笔记的sort_order为当前最大值加1
 
-        newItem->setData(Qt::UserRole, QVariant(newSortOrder));
-        newItem->setData(Qt::UserRole+1, QVariant(newIdOrder));
+        QString title = "点击编辑标题";
+
+        QListWidgetItem * newItem = addItemToWidget(title, newSortOrder, newIdOrder, item_font, ui->listWidget);
+
+        // // 创建并初始化新项，允许编辑
+        // QListWidgetItem * newItem = new QListWidgetItem("点击编辑标题", ui->listWidget);
+
+        // newItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
+        // newItem->setData(Qt::UserRole, QVariant(newSortOrder));
+        // newItem->setData(Qt::UserRole+1, QVariant(newIdOrder));
+
+        ui->listWidget->setCurrentItem(newItem);
 
         QSqlQuery insertQuery;
         insertQuery.prepare("INSERT INTO notes (title, note, sort_order,id) VALUES (:title, :note, :sortOrder,:id)");
-        insertQuery.bindValue(":title", "点击编辑标题");
+        insertQuery.bindValue(":title", title);
         insertQuery.bindValue(":note", "");
         insertQuery.bindValue(":sortOrder", newSortOrder);
         insertQuery.bindValue(":id", newIdOrder);
@@ -597,7 +644,7 @@ void MainWindow::deleteSelectedItem()
     int currentRow = ui->listWidget->row(currentItem);
     if (currentItem)
     {
-        int idToDelete = currentItem->data(Qt::UserRole+1).toInt();
+        int idToDelete = currentItem->data(Qt::UserRole+1).toInt();  //获取id
 
         QSqlQuery deleteQuery;
         deleteQuery.prepare("DELETE FROM notes WHERE id = :id");
@@ -608,6 +655,7 @@ void MainWindow::deleteSelectedItem()
 
             ui->listWidget->takeItem(currentRow);
             delete currentItem;
+            // loadTitlesFromDatabase();
 
             // QMessageBox::information(this, "成功", "笔记已成功删除！");
             ui->statusbar->showMessage("笔记已成功删除！");
@@ -618,7 +666,7 @@ void MainWindow::deleteSelectedItem()
                 return;
             }
 
-            updateNoteContent();
+            // updateNoteContent();
         }
         else
         {
@@ -644,6 +692,7 @@ void MainWindow::ask_check()
             }
         } else {
             ui->info_label->setStyleSheet("color: red;");
+            ui->info_label->setText("心跳检测失败");
             qDebug() << "心跳检测失败：" << query.lastError().text();
         }
     });
@@ -771,7 +820,6 @@ void MainWindow::onCancelTopItemAt(QListWidgetItem *item)
 
     item->setData(Qt::UserRole, QVariant(0)); // 更新item的UserRole数据
 
-
     qDebug()<<"取消置顶操作成功";
     ui->statusbar->showMessage("取消置顶");
     loadTitlesFromDatabase();
@@ -783,12 +831,12 @@ void MainWindow::onCancelTopItemAt(QListWidgetItem *item)
 // ==============================================
 void MainWindow::showInfoMessage()
 {
-    // QMessageBox::information(this, tr("About MyNote"), tr("MyNote v2.0\nE-mail:yeshixin@qq.com\nCopyright Reserved"));
+    // QMessageBox::information(this, tr("About MyNote"), tr("MyNote v2.1\nE-mail:yeshixin@qq.com\nCopyright Reserved"));
 
     QString aboutMessage =
         "<html><head/><body>"
         "<center>"
-        "<h2>MyNote v2.0</h2>"
+        "<h2>MyNote v2.0.1(正式版24.07.24)</h2>"
         "<p>Email: <a href='mailto:yeshixin@qq.com'>yeshixin@qq.com</a></p>"
         "<p>Copyright © 2024. All Rights Reserved.</p>"
         "</center>"
